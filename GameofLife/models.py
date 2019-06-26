@@ -13,7 +13,22 @@ class BaseModel(PeeweeSignalModel):
         database = dbhandle
 
 
-class File(BaseModel):
+class User(BaseModel):
     id = AutoField()
-    title = CharField(max_length=100, null=True, default="")
-    filename = CharField(max_length=200, null=True, default="")
+    login = CharField(max_length=100, null=True, default="")
+    password = CharField(max_length=100, null=True, default="")
+    email = CharField(max_length=100, null=True, default="")
+    access_key = CharField(max_length=100, null=True, default="")
+    count_win = IntegerField(default=0)
+
+class GameSession(BaseModel):
+    id = AutoField()
+    name = CharField(max_length=100, null=True)
+    password = CharField(max_length=100, null=True, default="")
+    user1 = ForeignKeyField(User, related_name='FK_USER1_ID_GAME_SESSION', to_field='id',
+                                  null=True)
+    user2 = ForeignKeyField(User, related_name='FK_USER2_ID_GAME_SESSION', to_field='id',
+                                  null=True)
+    count_rounds = IntegerField(default = 5)
+    count_cells = IntegerField(default = 5)
+

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <title>GameOfLife</title>
+  </head>
+  <body>
+    <!-- no additional media querie or css is required -->
+    <div class="container login-container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 login-form-1">
+                <h3>Авторизация</h3>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Введите логин *" value="" id="log"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" placeholder="Введите пароль *" value="" id="pass"/>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" onclick="auth(log.value, pass.value)">Войти</button>
+                        <a href="#" class="ForgetPwd mt-2 float-right">Регистрация</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .login-container{ margin-top: 5%; margin-bottom: 5%; }
+        .login-form-1{ padding: 5%; box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);}
+        .login-form-1 h3{ text-align: center; color: #333; }
+        .login-container form{ padding: 10%; }
+        .btnSubmit{ width: 50%; border-radius: 1rem; padding: 1.5%; border: none; cursor: pointer; }
+        .login-form-1 .btnSubmit{ font-weight: 600; color: #fff; background-color: #0062cc; }
+        .login-form-1 .ForgetPwd{ color: #0062cc; font-weight: 600; text-decoration: none; }
+    </style>
+
+    <script type="text/javascript">
+      function auth(log, pass) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/sign_in', true);
+          xhr.setRequestHeader('Content-Type', 'application/json')
+          data = {
+            login: log,
+            password: pass,
+          }
+          data = JSON.stringify(data);
+          xhr.onload = function(e){
+              if (xhr.status != 200) {
+                console.log(xhr.status + ': ' + xhr.statusText);
+              } else {
+                    var data = JSON.parse(xhr.responseText);
+                    if(data.code == "0"){
+                        document.location.href = "http://127.0.0.1:5000";
+                    } else {
+                        alert('Неправильный логин или пароль!');
+                    }
+              }
+          }
+          xhr.send(data);
+      }
+    </script>
+
+  </body>
+</html>
