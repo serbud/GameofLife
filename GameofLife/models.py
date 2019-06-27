@@ -31,4 +31,10 @@ class GameSession(BaseModel):
                                   null=True)
     count_rounds = IntegerField(default = 5)
     count_cells = IntegerField(default = 5)
+    round = IntegerField(default = 0)
 
+class ChangeChecked(BaseModel):
+    id = AutoField()
+    user = ForeignKeyField(User, related_name='FK_USER_ID_GAME_SESSION', to_field='id',
+                                  null=True)
+    checked = BooleanField(default = True)
