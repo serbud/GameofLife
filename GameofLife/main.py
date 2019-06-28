@@ -245,6 +245,7 @@ def get_new_game_sessions():
 
 @app.route('/course', methods=['POST'])
 def course():
+
     access_key = request.cookies.get("access_key")
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
@@ -260,7 +261,6 @@ def course():
                 if (u1.ready and u2.ready):
                     try:
                         f = open('worlds/'+gs.name+".pickle", 'rb')
-
                         world = pickle.load(f)
                     except:
                         f = open('worlds/'+gs.name+".pickle", 'wb')
@@ -403,7 +403,7 @@ def course():
                     gs.save()
 
 
-                    return "daafa"
+                    return json.dumps({"new_world": world2})
                 else:
                     return json.dumps({"code": "3"})
             else:
@@ -421,10 +421,13 @@ def course():
 #     send(json, json=True)
 
 @socketio.on('message')
-def handleMessage(id, i, j):
+def handleMessage(id, j, i):
 
-
+    id = str(id)
     print('Message: ' + id, i, j)
+
+    i = str(int(i)+1)
+    j = str(int(j) + 1)
     us1 = User.get_or_none(User.id == id)
     gs = GameSession.get_or_none(GameSession.user1 == id)
 
@@ -437,19 +440,22 @@ def handleMessage(id, i, j):
     f = open('worlds/' + gs.name + ".pickle", 'wb')
     i = int(i)
     j = int(j)
+    color = -1
     if id == str(gs.user1):
         if world[i][j] == 0:
             world[i][j] = 3
+            color = 1
         elif world[i][j] == 3:
             world[i][j] = 0
+            color = 0
     else:
         if world[i][j] == 0:
             world[i][j] = 4
+            color = 2
         elif world[i][j] == 4:
             world[i][j] = 0
+            color = 0
 
-    for i in world:
-        print(i)
 
 
     pickle.dump(world, f)
@@ -459,7 +465,8 @@ def handleMessage(id, i, j):
     us1 = gs.user1
     us2 = gs.user2
 
-    send((us1.login, us2.login, i, j), broadcast=True)
+
+    send((us1.id, us2.id, j-1 , i-1 ,color), broadcast=True)
 
 
 @app.route('/test_socket', methods=['GET'])

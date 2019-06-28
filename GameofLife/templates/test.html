@@ -13,36 +13,63 @@
 
     <title>GameOfLife</title>
 </head>
-<body>
+<body onload="sock()">
 
     <div class="container login-container">
-        <input type="text" value="" id="one">
-        <input type="text" value="" id="two">
-        <input type="text" value="" id="three">
-        <button type="button" class="btn btn-primary" onclick="sock(one.value, two.value, three.value)">Войти</button>
+        <button type="button" class="btn btn-primary" onclick="sock()">Войти</button>
+
+        <canvas style="width: 500px; height: 500px; border: 3px solid black; margin: 40px;" id="c1" width="500" height="500"></canvas>
+        <p>Количество циклов: <span id="count">0</span></p>
+        <button id="start">Start</button>
+
     </div>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-        let f = false;
-        function sock(one, two, three){
-            f = true;
-            var socket = io.connect('http://127.0.0.1:5000');
-            socket.on('connect', function(){
-                if (f == true)
-                    {
-                        socket.send(one, two, three);
-                        f = false;
-                    }
-            });
-            socket.on('message', function(one, two, three , four){
-                if (one == {{ id }} || two == {{ id }})
-                {
-                    console.log(one, two,three, four)
-                }
-            });
+    <script src="/static/test.js" ></script>
+    <script type="text/javascript">
+    var socket = io.connect('http://127.0.0.1:5000');
+    var f = false;
+    socket.on('message', function(one, two, x , y , color){
+        if (one == {{ id }} || two == {{ id }})
+        {
+            console.log(x, y);
+            console.log(color);
+            drawField(color,x,y);
         }
+    });
+
+    // При клике на игровом поле мы должны подставить героя.
+    canvas.onclick = function(event) {
+        var x = event.offsetX; // кордината определяется относительно кенваса
+        var y = event.offsetY;
+
+        // Координаты при клике определяются от 0 до 30.
+        x = Math.floor(x/10); // 300:10 = 30
+        y = Math.floor(y/10);
+
+        console.log(x);
+        console.log(y);
+
+        socket.send({{ id }}, x, y);
+
+        mas[y][x]=1; // поле, при клике на которое, ставится 1.
+    }
     </script>
+
 
 </body>
 </html>
+
+<!--   socket.on('connect', function(){-->
+<!--                    {-->
+<!--                        socket.send({{ id }}, two, three);-->
+
+<!--                    }-->
+<!--            });}-->
+
+
+<!--  socket.on('message', function(one, two, x , y, color)-->
+<!--        {-->
+
+<!--            if (one == {{ id }} || two == {{ id }}) console.log(color);-->
+<!--        });-->
