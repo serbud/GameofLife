@@ -36,22 +36,22 @@ goLife();
 
 function drawField(color,x,y) {
     createLine();
-        console.log(color,x,y)
-        if(color == 1) {
-            console.log("blue");
-            ctx.fillStyle = "blue";
-            ctx.fillRect(x*10+1, y*10+1, 9, 9);
-        }
-        else if(color == 2) {
-            console.log("red");
-            ctx.fillStyle = "red";
-            ctx.fillRect(x*10+1, y*10+1, 9, 9);
-        }
-        else {
-            console.log("white");
-            ctx.fillStyle = "white";
-            ctx.fillRect(x*10+1, y*10+1, 9, 9);
-        }
+    console.log(color,x,y)
+    if(color == 1) {
+        console.log("blue");
+        ctx.fillStyle = "blue";
+        ctx.fillRect(x*10+1, y*10+1, 9, 9);
+    }
+    else if(color == 2) {
+        console.log("red");
+        ctx.fillStyle = "red";
+        ctx.fillRect(x*10+1, y*10+1, 9, 9);
+    }
+    else {
+        console.log("white");
+        ctx.fillStyle = "white";
+        ctx.fillRect(x*10+1, y*10+1, 9, 9);
+    }
 }
 
 function sock(){
@@ -64,19 +64,20 @@ function sock(){
       if (xhr.status != 200) {
         console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
       } else {
-        var data = JSON.parse(xhr.responseText);
-        if(data.new_world != ""){
-            mas = data.new_world
-            for(var i = 0; i < 50; i++) {
-                for(var j = 0; j < 50; j++) {
-                        drawField(mas[i][j],i,j);
+            var data = JSON.parse(xhr.responseText);
+            if(data.new_world != ""){
+                mas = data.new_world
+                for(var i = 1; i < 6; i++) {
+                    for(var j = 1; j < 6; j++) {
+                            console.log(i,j);
+                            drawField(mas[i][j], i , j);
+                    }
                 }
             }
+            else{
+            console.log("fff")
+            }
         }
-        else{
-            alert('kek');
-        }
-
-        }
+    }
     xhr.send(data);
 }
