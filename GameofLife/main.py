@@ -88,7 +88,6 @@ def add_game_session():
             if 'password' in data:
                 gs.password = data["password"]
                 gs.save()
-
             for cc in ChangeChecked.select():
                 cc.checked = False
                 cc.save()
@@ -150,7 +149,7 @@ def game_sessions():
 
 @app.route('/add_user_to_game_session', methods=['POST'])
 def add_user_to_game_session():
-    access_key = request.cookies.get("access_key")
+    access_key = reworldsquest.cookies.get("access_key")
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
@@ -242,34 +241,39 @@ def get_new_game_sessions():
     else:
         return json.dumps({"code": "1"})
 
+checked_course = {}
+
 
 @app.route('/course', methods=['POST'])
 def course():
-
+    global checked_course
     access_key = request.cookies.get("access_key")
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
-            us.ready = True
-            us.save()
+
             gs = GameSession.get_or_none(GameSession.user1 == us)
             if gs == None:
                 gs = GameSession.get_or_none(GameSession.user2 == us)
             if gs != None:
-                u1 = gs.user1
-                u2 = gs.user2
-                if (u1.ready and u2.ready):
+
+
+                if us == gs.user1:
+                    enemy_object = gs.user2
+                else:
+                    enemy_object = gs.user1
+                if (enemy_object.ready):
                     try:
                         f = open('worlds/'+gs.name+".pickle", 'rb')
                         world = pickle.load(f)
                     except:
                         f = open('worlds/'+gs.name+".pickle", 'wb')
                         world = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
+                    checked_course[gs.name] = True
 
-                    print(world[4][3])
 
-                    for i1 in world:
-                        print(i1)
+                    # for i1 in world:
+                    #     print(i1)
 
 
                     data = request.get_json()
@@ -366,26 +370,28 @@ def course():
                     f = open('worlds/'+gs.name+".pickle", 'wb')
                     pickle.dump(world2, f)
                     f.close()
+                    us.ready = True
+                    us.save()
 
-
                     print("")
                     print("")
                     print("")
                     print("")
 
-                    for i in world2:
-                        print(i)
+                    # for i in world2:
+                    #     print(i)
 
                     gs.round += 1
                     gs.save()
 
-                    u1.ready = False
-                    u2.ready = False
-                    u1.save()
-                    u2.save()
+
+                    f2 = open('worlds/' + gs.name + "changes.pickle", 'wb')
+                    pickle.dump(resp, f2)
+                    f2.close()
+
                     return json.dumps({"new_world": resp})
                 else:
-                    return json.dumps({"code": "3"})
+                    return json.dumps({"code": 5})
             else:
                 return json.dumps({"code": "2"})
 
@@ -445,8 +451,8 @@ def handleMessage(id, j, i):
     us1 = gs.user1
     us2 = gs.user2
 
-    for i1 in world:
-        print(i1)
+    # for i1 in world:
+    #     print(i1)
     send((us1.id, us2.id, j-1 , i-1 ,color), broadcast=True)
 
 
@@ -467,6 +473,7 @@ def test_socket():
 
 @app.route('/lp_check_ready', methods=['GET'])
 def lp_check_ready():
+    print("lp start")
     start = time.monotonic()
     now = time.monotonic()
     passtime = 0
@@ -476,24 +483,49 @@ def lp_check_ready():
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
             gs = GameSession.get_or_none(GameSession.user1 == us)
-            u = 1
-            enemy = gs.user2
+            us.ready = True
+            us.save()
             if gs == None:
                 gs = GameSession.get_or_none(GameSession.user2 == us)
                 enemy = gs.user1
+                enemy = enemy.id
+            else:
+                enemy = gs.user2
+                enemy = enemy.id
 
+            print("enemy",enemy)
             start = time.monotonic()
             now = time.monotonic()
             passtime = 0
             f = False
             while (not f and passtime < 60):
-                f = enemy.ready
+
+                time.sleep(0.01)
+                enemy_object = User.get_or_none(User.id == enemy)
+                f = enemy_object.ready
+                #print(f)
+                if f:
+
+                    f2 = open('worlds/' + gs.name + "changes.pickle", 'rb')
+                    new_world = pickle.load(f2)
+
+                    f2.close()
+                    u1 = gs.user1
+                    u2 = gs.user2
+                    u1.ready = False
+                    u2.ready = False
+                    u1.save()
+                    u2.save()
+
                 now = time.monotonic()
                 passtime = '{:>9.2f}'.format(now - start)
                 passtime = float(passtime)
 
+            print(new_world)
+            print("lp finish")
             return json.dumps({"code": "0",
-                               "changed": str(f)
+                               "changed": str(f),
+                               "new_world": new_world
                                })
 
         else:

@@ -64,24 +64,82 @@ function sock(option){
     xhr.onload = function(e){
       if (xhr.status != 200) {
         console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
-      } else {
-            var data = JSON.parse(xhr.responseText);
-            if(data.new_world != ""){
+      }
+      else {
+        var data = JSON.parse(xhr.responseText);
 
-
-                for (var idx = 0; idx < data.new_world.length; idx++ ){
-                  jjj = jjj+1
-                  drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1);
-
-                }
-
-            }
-            else{
-            console.log("fff")
-            }
+        if (data.code == 5)
+        {
+            console.log("lp ready")
+            get_ready();
         }
-    }
-    xhr.send(data);True
+        else{
+        if(data.new_world != ""){
+
+
+            for (var idx = 0; idx < data.new_world.length; idx++ ){
+
+              drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1);
+
+            }
+
+        }
+        else{
+        console.log("fff")
+        }
+        }
+    }}
+    xhr.send(data);
 }
 
 
+
+function get_ready(){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/lp_check_ready', true);
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    data = {"":""}
+    data = JSON.stringify(data);
+    xhr.onload = function(e){
+      if (xhr.status != 200) {
+        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+      } else {
+             var data = JSON.parse(xhr.responseText);
+            if(data.changed == "True"){
+                for (var idx = 0; idx < data.new_world.length; idx++ ){
+                    drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1);
+                    }
+            }
+            else{
+                get_ready();
+            }
+
+    }}
+    xhr.send(data);
+}
+
+
+//
+//function get_ready1(){
+//
+//    var xhr = new XMLHttpRequest();
+//    xhr.open('GET', '/lp_check_ready', true);
+//    xhr.setRequestHeader('Content-Type', 'application/json')
+//    data = {"":""}
+//    data = JSON.stringify(data);
+//
+//    xhr.onload = function(e){
+//        if (xhr.status != 200) {
+//            console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+//        } else {
+//            var data = JSON.parse(xhr.responseText);
+//            if(data.changed == "True"){
+//                console.log('чат не выбран!')
+//            }
+//            else{
+//                get_ready();
+//            }
+//         }
+//    }
+//    xhr.send(data);
+//}
