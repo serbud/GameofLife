@@ -54,12 +54,12 @@ function drawField(color,x,y) {
     }
 }
 
-function sock(option){
+function sock(){
     var jjj = 0;
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/course', true);
     xhr.setRequestHeader('Content-Type', 'application/json')
-    data = {code:option}
+    data = {"":""}
     data = JSON.stringify(data);
     xhr.onload = function(e){
       if (xhr.status != 200) {
@@ -67,21 +67,23 @@ function sock(option){
       } else {
             var data = JSON.parse(xhr.responseText);
             if(data.new_world != ""){
+                mas = data.new_world
+                for(var j = 1; j < 6; j++) {
+                    for(var i = 1; i < 6; i++) {
+                            console.log(j,i);
+                               for (var idx = 0; idx < data.chats.length; idx++ ){
 
-
-                for (var idx = 0; idx < data.new_world.length; idx++ ){
-                  jjj = jjj+1
-                  drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1);
-
+                    }
+                            drawField(mas[j][i], i-1 , j-1);
+                            jjj = jjj + 1;
+                    }
                 }
-
+            alert(jjj);
             }
             else{
             console.log("fff")
             }
         }
     }
-    xhr.send(data);True
+    xhr.send(data);
 }
-
-

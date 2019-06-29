@@ -272,92 +272,111 @@ def course():
                         print(i1)
 
 
-                    data = request.get_json()
-                    if data["code"] == 1:
-                        code = True
-                    elif data["code"] == 0:
-                        code = False
 
-                    print("code", code)
-                    for i in range(1,N+1,1):
-                        for j in range(1,M+1,1):
+
+
+
+                    for i in range(1 ,N+1 ,1):
+                        for j in range(1, M+1, 1):
 
 
                             if world[i][j] == 3:
                                 world[i][j] = 1
 
-                            if (world[i][j] == 4 or  world[i][j] == 2):
-                                world[i][j] = 10
+                            if world[i][j] == 4:
+                                world[i][j] = 2
 
                     world2 = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
 
-                    resp = []
-
                     for i in range(1 ,N+1 ,1):
                         for j in range(1, M+1, 1):
-                            g = world[i-1][j-1] + world[i][j-1] + world[i+1][j-1] + world[i-1][j] + world[i+1][j] + world[i-1][j+1] + world[i][j+1] + world[i+1][j+1]
-                            g1 = g % 10
-                            g2 = g // 10
+                            g1 = 0
+                            g2 = 0
+
+                            if world[i][j] == 3:
+                                world[i][j] = 1
+
+                            if world[i][j] == 4:
+                                world[i][j] = 2
+
+                            #GAMER1
 
 
-                            r = None
+                            if world[i-1][j-1] == 1:
+                                g1 += 1
+
+                            if world[i][j-1] == 1:
+                                g1 += 1
+                            print(world[4][3])
+                            if world[i+1][j-1] == 1:
+                                g1 += 1
+
+                            if world[i-1][j] == 1:
+                                g1 += 1
+
+                            if world[i+1][j] == 1:
+                                g1 += 1
+
+                            if world[i-1][j+1] == 1:
+                                g1 += 1
+
+                            if world[i][j+1] == 1:
+                                g1 += 1
+
+                            if world[i+1][j+1] == 1:
+                                g1 += 1
+
+
+                            # GAMER2
+                            if world[i - 1][j - 1] == 2:
+                                g2 += 1
+
+                            if world[i][j - 1] == 2:
+                                g2 += 1
+
+                            if world[i + 1][j - 1] == 2:
+                                g2 += 1
+
+                            if world[i - 1][j] == 2:
+                                g2 += 1
+
+                            if world[i + 1][j] == 2:
+                                g2 += 1
+
+                            if world[i - 1][j + 1] == 2:
+                                g2 += 1
+
+                            if world[i][j + 1] == 2:
+                                g2 += 1
+
+                            if world[i + 1][j + 1] == 2:
+                                g2 += 1
+
+
+                            if g1 != 0:
+                                print(g1)
+                            if g2 != 0:
+                                print(g2)
+
                             if (g1 == 3 and g2 == 3):
-                                r = {
-                                    "i" : i,
-                                    "j" : j,
-                                    "value" : 0
-                                }
                                 world2[i][j] = 0
 
 
                             elif g1 == 3:
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 1
-                                }
                                 world2[i][j] = 1
 
                             elif g2 == 3:
                                 world2[i][j] = 2
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 2
-                                }
 
                             elif (world[i][j] == 1 and (g1 > 3 or g1 < 2)):
 
                                 world2[i][j] = 0
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 0
-                                }
 
-                            elif (world[i][j] == 10 and (g2 > 3 or g2 < 2)):
+                            elif (world[i][j] == 2 and (g2 > 3 or g2 < 2)):
 
                                 world2[i][j] = 0
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 0
-                                }
                             else:
-                                if world[i][j] == 10:
-                                    world2[i][j] = 2
-                                else:
-                                    world2[i][j] = world[i][j]
-
-                                if code:
-                                    if world2[i][j] != 0:
-                                        r = {
-                                            "i": i,
-                                            "j": j,
-                                            "value": world2[i][j]
-                                        }
-                            if r != None:
-                                resp.append(r)
+                                world2[i][j] = world[i][j]
 
                     f.close()
 
@@ -373,17 +392,14 @@ def course():
                     print("")
                     print("")
 
-                    for i in world2:
+                    for i in  world2:
                         print(i)
 
                     gs.round += 1
                     gs.save()
 
-                    u1.ready = False
-                    u2.ready = False
-                    u1.save()
-                    u2.save()
-                    return json.dumps({"new_world": resp})
+
+                    return json.dumps({"new_world": world2})
                 else:
                     return json.dumps({"code": "3"})
             else:
@@ -465,42 +481,6 @@ def test_socket():
         return json.dumps({"code": "1"})
 
 
-@app.route('/lp_check_ready', methods=['GET'])
-def lp_check_ready():
-    start = time.monotonic()
-    now = time.monotonic()
-    passtime = 0
-    access_key = request.cookies.get("access_key")
-
-    if access_key != None:
-        us = User.get_or_none(User.access_key == access_key)
-        if us != None:
-            gs = GameSession.get_or_none(GameSession.user1 == us)
-            u = 1
-            enemy = gs.user2
-            if gs == None:
-                gs = GameSession.get_or_none(GameSession.user2 == us)
-                enemy = gs.user1
-
-            start = time.monotonic()
-            now = time.monotonic()
-            passtime = 0
-            f = False
-            while (not f and passtime < 60):
-                f = enemy.ready
-                now = time.monotonic()
-                passtime = '{:>9.2f}'.format(now - start)
-                passtime = float(passtime)
-
-            return json.dumps({"code": "0",
-                               "changed": str(f)
-                               })
-
-        else:
-            return json.dumps({"code": "1"})
-    else:
-        return json.dumps({"code": "1"})
-
 
 if __name__ == '__main__':
     try:
@@ -508,6 +488,6 @@ if __name__ == '__main__':
     except peewee.InternalError as px:
         print(str(px))
 
-    N = 50
-    M = 50
+    N = 5
+    M = 5
     socketio.run(app)
