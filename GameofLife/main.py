@@ -149,7 +149,7 @@ def game_sessions():
 
 @app.route('/add_user_to_game_session', methods=['POST'])
 def add_user_to_game_session():
-    access_key = reworldsquest.cookies.get("access_key")
+    access_key = request.cookies.get("access_key")
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
@@ -241,12 +241,12 @@ def get_new_game_sessions():
     else:
         return json.dumps({"code": "1"})
 
-checked_course = {}
+check_course = {}
 
 
 @app.route('/course', methods=['POST'])
 def course():
-    global checked_course
+    global check_course
     access_key = request.cookies.get("access_key")
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
@@ -257,11 +257,15 @@ def course():
                 gs = GameSession.get_or_none(GameSession.user2 == us)
             if gs != None:
 
-
+                data = request.get_json()
                 if us == gs.user1:
                     enemy_object = gs.user2
                 else:
                     enemy_object = gs.user1
+                if gs.name in check_course:
+                    check_course[gs.name] += data["code"]
+                else:
+                    check_course[gs.name] = data["code"]
                 if (enemy_object.ready):
                     try:
                         f = open('worlds/'+gs.name+".pickle", 'rb')
@@ -269,18 +273,24 @@ def course():
                     except:
                         f = open('worlds/'+gs.name+".pickle", 'wb')
                         world = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
-                    checked_course[gs.name] = True
+                    # check_course[gs.name] = True
 
-
+                    print("gs.count_cells",gs.count_cells)
+                    
+                    us.remain_cells = gs.count_cells
+                    us.save()
+                    enemy_object.remain_cells = gs.count_cells
+                    enemy_object.save()
                     # for i1 in world:
                     #     print(i1)
+                    print("gs.count_cells",gs.count_cells, enemy_object.remain_cells, us.remain_cells)
 
 
-                    data = request.get_json()
-                    if data["code"] == 1:
+                    if check_course[gs.name] > 0:
                         code = True
-                    elif data["code"] == 0:
+                    else:
                         code = False
+                    check_course[gs.name] = 0
 
                     print("code", code)
                     for i in range(1,N+1,1):
@@ -385,11 +395,13 @@ def course():
                     gs.save()
 
 
+
                     f2 = open('worlds/' + gs.name + "changes.pickle", 'wb')
                     pickle.dump(resp, f2)
                     f2.close()
-
-                    return json.dumps({"new_world": resp})
+                    gs.round += 1
+                    return json.dumps({"new_world": resp,
+                                       "round": gs.round})
                 else:
                     return json.dumps({"code": 5})
             else:
@@ -427,33 +439,58 @@ def handleMessage(id, j, i):
     i = int(i)
     j = int(j)
     color = -1
+
+    us1 = gs.user1
+    us2 = gs.user2
+
+
+
     if id == str(gs.user1):
+        us = us1
+        enemy = us2
         if world[i][j] == 0:
             world[i][j] = 3
             color = 1
+            us.remain_cells -= 1
+
         elif world[i][j] == 3:
             world[i][j] = 0
             color = 0
+            us.remain_cells += 1
     else:
+        us = us2
+        enemy = us1
         if world[i][j] == 0:
             world[i][j] = 4
             color = 2
+            us.remain_cells -= 1
+
         elif world[i][j] == 4:
             world[i][j] = 0
             color = 0
+            us.remain_cells += 1
 
 
+    us.save()
+    enemy.save()
+
+
+
+
+    us1.save()
+    us2.save()
 
     pickle.dump(world, f)
     f.close()
 
 
-    us1 = gs.user1
-    us2 = gs.user2
+
+
 
     # for i1 in world:
     #     print(i1)
-    send((us1.id, us2.id, j-1 , i-1 ,color), broadcast=True)
+    print(us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells)
+    send((us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells), broadcast=True)
 
 
 @app.route('/test_socket', methods=['GET'])
@@ -532,7 +569,7 @@ def lp_check_ready():
             return json.dumps({"code": "1"})
     else:
         return json.dumps({"code": "1"})
-
+                               
 
 if __name__ == '__main__':
     try:

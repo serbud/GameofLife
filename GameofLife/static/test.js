@@ -55,7 +55,7 @@ function drawField(color,x,y) {
 }
 
 function sock(option){
-    var jjj = 0;
+
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/course', true);
     xhr.setRequestHeader('Content-Type', 'application/json')

@@ -21,6 +21,7 @@ class User(BaseModel):
     access_key = CharField(max_length=100, null=True, default="")
     count_win = IntegerField(default=0)
     ready = BooleanField(default=True)
+    remain_cells = IntegerField(default=0)
 
 class GameSession(BaseModel):
     id = AutoField()

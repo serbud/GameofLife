@@ -15,12 +15,20 @@
 </head>
 <body onload="sock(1)">
 
-    <div class="container login-container">
-        <button type="button" class="btn btn-primary" onclick="sock(0)">Войти</button>
 
-        <canvas style="width: 500px; height: 500px; border: 3px solid black; margin: 40px;" id="c1" width="500" height="500"></canvas>
-        <p>Количество циклов: <span id="count">0</span></p>
-        <button id="start">Start</button>
+    <div class="container login-container">
+        <div class="row">
+            <div style="width:100%; display:flex; justify-content: center" >
+                <div style="box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19); padding: 20px">
+                    <canvas style="width: 500px; height: 500px; border: 3px solid black; " id="c1" width="500" height="500"></canvas>
+                    <div class="mt-3">
+                        <span>Текущий раунд: <input type="text" value="0" id="round" readonly style="width:25px; padding: 5px"></span>
+                        <span class="ml-3">Оставщиеся клетки: <input type="text" id="state" value="1" readonly style="width:25px;  padding: 5px"></span>
+                        <button type="button" class="btn btn-primary float-right" onclick="sock(0)">Готов</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
     <script src="/static/test.js" ></script>
@@ -29,11 +37,13 @@
     <script type="text/javascript">
     var socket = io.connect('http://127.0.0.1:5000');
     var f = false;
-    socket.on('message', function(one, two, x , y , color){
+    socket.on('message', function( one, two, x , y , color, state_response){
         if (one == {{ id }} || two == {{ id }})
         {
-            console.log(x, y);
-            console.log(color);
+            if  (one == {{ id }})
+            {kek = document.getElementById('state');
+            kek.value = state_response;
+
             drawField(color,x,y);
         }
     });
