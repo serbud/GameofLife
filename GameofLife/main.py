@@ -1,6 +1,6 @@
 from flask import Flask, request, make_response, jsonify
 from flask_socketio import SocketIO, send, emit
-from flask import render_template
+from flask import render_template, redirect
 from models import *
 import json
 import uuid
@@ -52,7 +52,19 @@ def sign_in():
 
 @app.route('/',methods=['GET'])
 def main_page():
-    return render_template('gamesession.html')
+
+    access_key = request.cookies.get("access_key")
+    if access_key != None:
+        us = User.get_or_none(User.access_key == access_key)
+        if us != None:
+            return render_template('gamesession.html')
+
+
+        else:
+            return redirect("http://127.0.0.1:5000/sign_in", code=302)
+    else:
+        return redirect("http://127.0.0.1:5000/sign_in", code=302)
+
 
 @app.route('/sign_in',methods=['POST'])
 def POST_sign_in():
@@ -129,7 +141,8 @@ def game_sessions():
 
 
 
-            return json.dumps({"game_sessions": gsm})
+            return json.dumps({"game_sessions": gsm,
+                               "code":"0"})
         else:
             return json.dumps({"code": "1"})
     else:
@@ -217,7 +230,7 @@ def get_new_game_sessions():
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
-
+            print("us")
             start = time.monotonic()
             now = time.monotonic()
             passtime = 0
@@ -225,7 +238,11 @@ def get_new_game_sessions():
             while (not f and passtime<60):
 
                 cc = ChangeChecked.get_or_none(ChangeChecked.user == us)
-                f = not cc.checked
+                if cc != None:
+                    f = not cc.checked
+                else:
+                    cc = ChangeChecked(user=us)
+                    cc.save()
                 now = time.monotonic()
                 passtime = '{:>9.2f}'.format(now - start)
                 passtime = float(passtime)
@@ -242,11 +259,15 @@ def get_new_game_sessions():
         return json.dumps({"code": "1"})
 
 check_course = {}
+tmp = {}
+changes = {}
 
 
 @app.route('/course', methods=['POST'])
 def course():
     global check_course
+    global tmp
+
     access_key = request.cookies.get("access_key")
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
@@ -266,6 +287,7 @@ def course():
                     check_course[gs.name] += data["code"]
                 else:
                     check_course[gs.name] = data["code"]
+                print("enemy_object",enemy_object.id,enemy_object.ready)
                 if (enemy_object.ready):
                     try:
                         f = open('worlds/'+gs.name+".pickle", 'rb')
@@ -281,6 +303,7 @@ def course():
                     us.save()
                     enemy_object.remain_cells = gs.count_cells
                     enemy_object.save()
+
                     # for i1 in world:
                     #     print(i1)
                     print("gs.count_cells",gs.count_cells, enemy_object.remain_cells, us.remain_cells)
@@ -312,6 +335,7 @@ def course():
                             g = world[i-1][j-1] + world[i][j-1] + world[i+1][j-1] + world[i-1][j] + world[i+1][j] + world[i-1][j+1] + world[i][j+1] + world[i+1][j+1]
                             g1 = g % 10
                             g2 = g // 10
+
 
 
                             r = None
@@ -396,14 +420,24 @@ def course():
 
 
 
-                    f2 = open('worlds/' + gs.name + "changes.pickle", 'wb')
-                    pickle.dump(resp, f2)
-                    f2.close()
+                    # f2 = open('worlds/' + gs.name + "changes.pickle", 'wb')
+                    # pickle.dump(resp, f2)
+                    # f2.close()
+
+                    resp = {"new_world": resp,
+                                       "round": gs.round,
+                                       "state_response": gs.count_cells}
+                    changes[gs.name] = resp
+
+                    tmp[gs.name] = True
+
+
                     gs.round += 1
-                    return json.dumps({"new_world": resp,
-                                       "round": gs.round})
+                    return json.dumps(resp)
                 else:
+
                     return json.dumps({"code": 5})
+
             else:
                 return json.dumps({"code": "2"})
 
@@ -420,7 +454,7 @@ def course():
 
 @socketio.on('message')
 def handleMessage(id, j, i):
-
+    global check_course
     id = str(id)
     print('Message: ' + id, i, j)
 
@@ -431,66 +465,68 @@ def handleMessage(id, j, i):
 
     if gs == None:
         gs = GameSession.get_or_none(GameSession.user2 == id)
+    if gs.name in check_course:
+        print("check_course[gs.name]",check_course[gs.name])
+        if not check_course[gs.name]:
+            f = open('worlds/' + gs.name + ".pickle", 'rb')
+            world = pickle.load(f)
+            f.close()
+            f = open('worlds/' + gs.name + ".pickle", 'wb')
+            i = int(i)
+            j = int(j)
+            color = -1
 
-    f = open('worlds/' + gs.name + ".pickle", 'rb')
-    world = pickle.load(f)
-    f.close()
-    f = open('worlds/' + gs.name + ".pickle", 'wb')
-    i = int(i)
-    j = int(j)
-    color = -1
-
-    us1 = gs.user1
-    us2 = gs.user2
-
-
-
-    if id == str(gs.user1):
-        us = us1
-        enemy = us2
-        if world[i][j] == 0:
-            world[i][j] = 3
-            color = 1
-            us.remain_cells -= 1
-
-        elif world[i][j] == 3:
-            world[i][j] = 0
-            color = 0
-            us.remain_cells += 1
-    else:
-        us = us2
-        enemy = us1
-        if world[i][j] == 0:
-            world[i][j] = 4
-            color = 2
-            us.remain_cells -= 1
-
-        elif world[i][j] == 4:
-            world[i][j] = 0
-            color = 0
-            us.remain_cells += 1
-
-
-    us.save()
-    enemy.save()
+            us1 = gs.user1
+            us2 = gs.user2
 
 
 
+            if id == str(gs.user1):
+                us = us1
+                enemy = us2
+                if world[i][j] == 0:
+                    world[i][j] = 3
+                    color = 1
+                    us.remain_cells -= 1
 
-    us1.save()
-    us2.save()
+                elif world[i][j] == 3:
+                    world[i][j] = 0
+                    color = 0
+                    us.remain_cells += 1
+            else:
+                us = us2
+                enemy = us1
+                if world[i][j] == 0:
+                    world[i][j] = 4
+                    color = 2
+                    us.remain_cells -= 1
 
-    pickle.dump(world, f)
-    f.close()
+                elif world[i][j] == 4:
+                    world[i][j] = 0
+                    color = 0
+                    us.remain_cells += 1
+
+
+            us.save()
+            enemy.save()
 
 
 
 
+            us1.save()
+            us2.save()
 
-    # for i1 in world:
-    #     print(i1)
-    print(us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells)
-    send((us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells), broadcast=True)
+            pickle.dump(world, f)
+            f.close()
+
+
+
+
+
+            # for i1 in world:
+            #     print(i1)
+            print(us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells)
+            send((us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells), broadcast=True)
 
 
 @app.route('/test_socket', methods=['GET'])
@@ -503,9 +539,9 @@ def test_socket():
 
 
         else:
-            return json.dumps({"code": "1"})
+            return redirect("http://127.0.0.1:5000/sign_in", code=302)
     else:
-        return json.dumps({"code": "1"})
+        return redirect("http://127.0.0.1:5000/sign_in", code=302)
 
 
 @app.route('/lp_check_ready', methods=['GET'])
@@ -515,7 +551,8 @@ def lp_check_ready():
     now = time.monotonic()
     passtime = 0
     access_key = request.cookies.get("access_key")
-
+    global tmp
+    global changes
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
@@ -535,35 +572,35 @@ def lp_check_ready():
             now = time.monotonic()
             passtime = 0
             f = False
+            new_world = {"changed" :"False"}
             while (not f and passtime < 60):
 
-                time.sleep(0.01)
-                enemy_object = User.get_or_none(User.id == enemy)
-                f = enemy_object.ready
+
+                # enemy_object = User.get_or_none(User.id == enemy)
+                if gs.name in tmp:
+                    f = tmp[gs.name]#enemy_object.ready
                 #print(f)
-                if f:
+                    if f:
 
-                    f2 = open('worlds/' + gs.name + "changes.pickle", 'rb')
-                    new_world = pickle.load(f2)
-
-                    f2.close()
-                    u1 = gs.user1
-                    u2 = gs.user2
-                    u1.ready = False
-                    u2.ready = False
-                    u1.save()
-                    u2.save()
-
+                        # f2 = open('worlds/' + gs.name + "changes.pickle", 'rb')
+                        new_world = changes[gs.name]#pickle.load(f2)
+                        new_world["changed"] = "True"
+                        print("new_world",new_world)
+                        tmp[gs.name] = False
+                        # f2.close()
+                        u1 = gs.user1
+                        u2 = gs.user2
+                        u1.ready = False
+                        u2.ready = False
+                        u1.save()
+                        u2.save()
                 now = time.monotonic()
                 passtime = '{:>9.2f}'.format(now - start)
                 passtime = float(passtime)
 
-            print(new_world)
+
             print("lp finish")
-            return json.dumps({"code": "0",
-                               "changed": str(f),
-                               "new_world": new_world
-                               })
+            return json.dumps(new_world)
 
         else:
             return json.dumps({"code": "1"})

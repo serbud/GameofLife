@@ -24,12 +24,14 @@
                     <div class="mt-3">
                         <span>Текущий раунд: <input type="text" value="0" id="round" readonly style="width:25px; padding: 5px"></span>
                         <span class="ml-3">Оставщиеся клетки: <input type="text" id="state" value="1" readonly style="width:25px;  padding: 5px"></span>
-                        <button type="button" class="btn btn-primary float-right" onclick="sock(0)">Готов</button>
+                        <div class="float-right">
+                            <button type="button" class="btn btn-primary" onclick="sock(0)">Готов</button>
+                            <div class="spinner-border ml-3 mt-2 spinner-border-sm" id="spinner"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
     <script src="/static/test.js" ></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
@@ -41,14 +43,12 @@
         if (one == {{ id }} || two == {{ id }})
         {
             if  (one == {{ id }})
-            {kek = document.getElementById('state');
-            kek.value = state_response;}
+            {cells = document.getElementById('state');
+             cells.value = state_response;}
 
             drawField(color,x,y);
         }
     });
-
-
 
 
     // При клике на игровом поле мы должны подставить героя.

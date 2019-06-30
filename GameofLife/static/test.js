@@ -47,7 +47,7 @@ function drawField(color,x,y) {
         ctx.fillStyle = "red";
         ctx.fillRect(x*10+1, y*10+1, 9, 9);
     }
-    else {
+    else if(color == 0){
         console.log("white");
         ctx.fillStyle = "white";
         ctx.fillRect(x*10+1, y*10+1, 9, 9);
@@ -55,7 +55,8 @@ function drawField(color,x,y) {
 }
 
 function sock(option){
-
+    on_spinner = document.getElementById('spinner');
+    on_spinner.classList.add("spinner-border");
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/course', true);
     xhr.setRequestHeader('Content-Type', 'application/json')
@@ -80,7 +81,12 @@ function sock(option){
             for (var idx = 0; idx < data.new_world.length; idx++ ){
 
               drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1);
-
+                cells = document.getElementById('state');
+                cells.value = data.state_response;
+                rounds = document.getElementById('round');
+                rounds.value = data.round;
+                on_spinner = document.getElementById('spinner');
+                on_spinner.classList.remove("spinner-border");
             }
 
         }
@@ -100,6 +106,9 @@ function get_ready(){
     xhr.setRequestHeader('Content-Type', 'application/json')
     data = {"":""}
     data = JSON.stringify(data);
+
+
+
     xhr.onload = function(e){
       if (xhr.status != 200) {
         console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
@@ -109,6 +118,13 @@ function get_ready(){
                 for (var idx = 0; idx < data.new_world.length; idx++ ){
                     drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1);
                     }
+                 cells = document.getElementById('state');
+                 cells.value = data.state_response;
+                 rounds = document.getElementById('round');
+                 rounds.value = data.round;
+                 console.log("rounds.value: ", rounds.value);
+                 on_spinner = document.getElementById('spinner');
+                 on_spinner.classList.remove("spinner-border");
             }
             else{
                 get_ready();
