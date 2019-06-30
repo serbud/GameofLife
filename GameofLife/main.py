@@ -272,7 +272,12 @@ def course():
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
-
+            if us.ready == True:
+                ffff = False
+            else:
+                us.ready = True
+                us.save()
+                ffff = True
             gs = GameSession.get_or_none(GameSession.user1 == us)
             if gs == None:
                 gs = GameSession.get_or_none(GameSession.user2 == us)
@@ -287,156 +292,196 @@ def course():
                     check_course[gs.name] += data["code"]
                 else:
                     check_course[gs.name] = data["code"]
-                print("enemy_object",enemy_object.id,enemy_object.ready)
-                if (enemy_object.ready):
-                    try:
-                        f = open('worlds/'+gs.name+".pickle", 'rb')
-                        world = pickle.load(f)
-                    except:
-                        f = open('worlds/'+gs.name+".pickle", 'wb')
-                        world = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
-                    # check_course[gs.name] = True
+                if enemy_object != None:
+                    if (enemy_object.ready):
+                        try:
+                            f = open('worlds/'+gs.name+".pickle", 'rb')
 
-                    print("gs.count_cells",gs.count_cells)
-                    
-                    us.remain_cells = gs.count_cells
-                    us.save()
-                    enemy_object.remain_cells = gs.count_cells
-                    enemy_object.save()
+                            world = pickle.load(f)
+                            if world == None:
+                                world = [[0 for i1 in range(N + 2)] for j1 in range(M + 2)]
+                        except:
+                            f = open('worlds/'+gs.name+".pickle", 'wb')
+                            world = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
+                        # check_course[gs.name] = True
 
-                    # for i1 in world:
-                    #     print(i1)
-                    print("gs.count_cells",gs.count_cells, enemy_object.remain_cells, us.remain_cells)
+                        print("gs.count_cells",gs.count_cells)
+
+                        us.remain_cells = gs.count_cells
+                        us.save()
 
 
-                    if check_course[gs.name] > 0:
-                        code = True
-                    else:
-                        code = False
-                    check_course[gs.name] = 0
+                        # for i1 in world:
+                        #     print(i1)
+                        print("gs.count_cells",gs.count_cells, enemy_object.remain_cells, us.remain_cells)
 
-                    print("code", code)
-                    for i in range(1,N+1,1):
-                        for j in range(1,M+1,1):
+                        enemy_object.remain_cells = gs.count_cells
+                        enemy_object.save()
+                        if check_course[gs.name] > 0:
+                            code = True
+                        else:
+                            code = False
+                        check_course[gs.name] = 0
 
-
-                            if world[i][j] == 3:
-                                world[i][j] = 1
-
-                            if (world[i][j] == 4 or  world[i][j] == 2):
-                                world[i][j] = 10
-
-                    world2 = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
-
-                    resp = []
-
-                    for i in range(1 ,N+1 ,1):
-                        for j in range(1, M+1, 1):
-                            g = world[i-1][j-1] + world[i][j-1] + world[i+1][j-1] + world[i-1][j] + world[i+1][j] + world[i-1][j+1] + world[i][j+1] + world[i+1][j+1]
-                            g1 = g % 10
-                            g2 = g // 10
+                        print("code", code)
+                        for i in range(1,N+1,1):
+                            for j in range(1,M+1,1):
 
 
+                                if world[i][j] == 3:
+                                    world[i][j] = 1
 
-                            r = None
-                            if (g1 == 3 and g2 == 3):
-                                r = {
-                                    "i" : i,
-                                    "j" : j,
-                                    "value" : 0
-                                }
-                                world2[i][j] = 0
+                                if (world[i][j] == 4 or  world[i][j] == 2):
+                                    world[i][j] = 10
+
+                        world2 = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
+
+                        resp = []
+
+                        for i in range(1 ,N+1 ,1):
+                            for j in range(1, M+1, 1):
+                                g = world[i-1][j-1] + world[i][j-1] + world[i+1][j-1] + world[i-1][j] + world[i+1][j] + world[i-1][j+1] + world[i][j+1] + world[i+1][j+1]
+                                g1 = g % 10
+                                g2 = g // 10
 
 
-                            elif g1 == 3:
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 1
-                                }
-                                world2[i][j] = 1
 
-                            elif g2 == 3:
-                                world2[i][j] = 2
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 2
-                                }
+                                r = None
+                                if (g1 == 3 and g2 == 3):
+                                    r = {
+                                        "i" : i,
+                                        "j" : j,
+                                        "value" : 0
+                                    }
+                                    world2[i][j] = 0
 
-                            elif (world[i][j] == 1 and (g1 > 3 or g1 < 2)):
 
-                                world2[i][j] = 0
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 0
-                                }
+                                elif g1 == 3:
+                                    r = {
+                                        "i": i,
+                                        "j": j,
+                                        "value": 1
+                                    }
+                                    world2[i][j] = 1
 
-                            elif (world[i][j] == 10 and (g2 > 3 or g2 < 2)):
-
-                                world2[i][j] = 0
-                                r = {
-                                    "i": i,
-                                    "j": j,
-                                    "value": 0
-                                }
-                            else:
-                                if world[i][j] == 10:
+                                elif g2 == 3:
                                     world2[i][j] = 2
+                                    r = {
+                                        "i": i,
+                                        "j": j,
+                                        "value": 2
+                                    }
+
+                                elif (world[i][j] == 1 and (g1 > 3 or g1 < 2)):
+
+                                    world2[i][j] = 0
+                                    r = {
+                                        "i": i,
+                                        "j": j,
+                                        "value": 0
+                                    }
+
+                                elif (world[i][j] == 10 and (g2 > 3 or g2 < 2)):
+
+                                    world2[i][j] = 0
+                                    r = {
+                                        "i": i,
+                                        "j": j,
+                                        "value": 0
+                                    }
                                 else:
-                                    world2[i][j] = world[i][j]
+                                    if world[i][j] == 10:
+                                        world2[i][j] = 2
+                                    else:
+                                        world2[i][j] = world[i][j]
 
-                                if code:
-                                    if world2[i][j] != 0:
-                                        r = {
-                                            "i": i,
-                                            "j": j,
-                                            "value": world2[i][j]
-                                        }
-                            if r != None:
-                                resp.append(r)
+                                    if code:
+                                        if world2[i][j] != 0:
+                                            r = {
+                                                "i": i,
+                                                "j": j,
+                                                "value": world2[i][j]
+                                            }
+                                if r != None:
+                                    resp.append(r)
 
-                    f.close()
-
-
-
-                    f = open('worlds/'+gs.name+".pickle", 'wb')
-                    pickle.dump(world2, f)
-                    f.close()
-                    us.ready = True
-                    us.save()
-
-                    print("")
-                    print("")
-                    print("")
-                    print("")
-
-                    # for i in world2:
-                    #     print(i)
-
-                    gs.round += 1
-                    gs.save()
+                        f.close()
 
 
 
-                    # f2 = open('worlds/' + gs.name + "changes.pickle", 'wb')
-                    # pickle.dump(resp, f2)
-                    # f2.close()
+                        f = open('worlds/'+gs.name+".pickle", 'wb')
+                        pickle.dump(world2, f)
+                        f.close()
+                        us.ready = True
+                        us.save()
 
-                    resp = {"new_world": resp,
-                                       "round": gs.round,
-                                       "state_response": gs.count_cells}
-                    changes[gs.name] = resp
+                        print("")
+                        print("")
+                        print("")
+                        print("")
 
-                    tmp[gs.name] = True
+                        # for i in world2:
+                        #     print(i)
+
+                        gs.round += 1
+                        gs.save()
 
 
-                    gs.round += 1
-                    return json.dumps(resp)
+
+                        # f2 = open('worlds/' + gs.name + "changes.pickle", 'wb')
+                        # pickle.dump(resp, f2)
+                        # f2.close()
+                        round = gs.round
+                        state_response = gs.count_cells
+                        if not (gs.round > gs.count_rounds):
+                            winner = 0
+                        else:
+                            g1 = 0
+                            g2 = 0
+                            for i in world2:
+                                for j in i:
+                                    if j == 1 :
+                                        g1 += 1
+                                    elif j == 2:
+                                        g2 += 1
+
+                            if us == gs.user1:
+                                if g1 > g2:
+                                    winner = 1
+                                else:
+                                    winner = 2
+                            else:
+                                if g1 > g2:
+                                    winner = 2
+                                else:
+                                    winner = 1
+
+                            f = open('worlds/' + gs.name + ".pickle", 'wb')
+                            pickle.dump(None, f)
+                            f.close()
+                            gs.delete_instance()
+                        resp = {"new_world": resp,
+                                    "winner": winner,
+                                           "round": round,
+                                           "state_response": state_response}
+                        changes[gs.name] = resp
+
+                        tmp[gs.name] = True
+
+
+                        gs.round += 1
+
+                        return json.dumps(resp)
+                    else:
+                        if not ffff:
+                            return json.dumps({"code": 6})
+                        else:
+                            return json.dumps({"code": 5})
                 else:
-
-                    return json.dumps({"code": 5})
+                    if not ffff:
+                        return json.dumps({"code": 6})
+                    else:
+                        return json.dumps({"code": 5})
 
             else:
                 return json.dumps({"code": "2"})
@@ -454,9 +499,12 @@ def course():
 
 @socketio.on('message')
 def handleMessage(id, j, i):
+
+
+    print("ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!")
     global check_course
     id = str(id)
-    print('Message: ' + id, i, j)
+
 
     i = str(int(i)+1)
     j = str(int(j) + 1)
@@ -466,7 +514,7 @@ def handleMessage(id, j, i):
     if gs == None:
         gs = GameSession.get_or_none(GameSession.user2 == id)
     if gs.name in check_course:
-        print("check_course[gs.name]",check_course[gs.name])
+        # print("check_course[gs.name]",check_course[gs.name])
         if not check_course[gs.name]:
             f = open('worlds/' + gs.name + ".pickle", 'rb')
             world = pickle.load(f)
@@ -484,7 +532,8 @@ def handleMessage(id, j, i):
             if id == str(gs.user1):
                 us = us1
                 enemy = us2
-                if world[i][j] == 0:
+                # print("us.remain_cells < gs.count_cells + 1",us.remain_cells, gs.count_cells + 1)
+                if (world[i][j] == 0 and us.remain_cells > 0):
                     world[i][j] = 3
                     color = 1
                     us.remain_cells -= 1
@@ -494,9 +543,11 @@ def handleMessage(id, j, i):
                     color = 0
                     us.remain_cells += 1
             else:
+
                 us = us2
                 enemy = us1
-                if world[i][j] == 0:
+                # print("us.remain_cells", us.remain_cells)
+                if (world[i][j] == 0 and us.remain_cells > 0):
                     world[i][j] = 4
                     color = 2
                     us.remain_cells -= 1
@@ -526,7 +577,8 @@ def handleMessage(id, j, i):
             # for i1 in world:
             #     print(i1)
             print(us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells)
-            send((us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells), broadcast=True)
+            if color != -1:
+                send((us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells), broadcast=True)
 
 
 @app.route('/test_socket', methods=['GET'])
@@ -557,14 +609,20 @@ def lp_check_ready():
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
             gs = GameSession.get_or_none(GameSession.user1 == us)
-            us.ready = True
+
             us.save()
             if gs == None:
-                gs = GameSession.get_or_none(GameSession.user2 == us)
-                enemy = gs.user1
+                enemy = None
+                while enemy == None:
+                    gs = GameSession.get_or_none(GameSession.user2 == us)
+                    enemy = gs.user1
+
                 enemy = enemy.id
             else:
-                enemy = gs.user2
+                enemy = None
+                while enemy == None:
+                    gs = GameSession.get_or_none(GameSession.user1 == us)
+                    enemy = gs.user2
                 enemy = enemy.id
 
             print("enemy",enemy)

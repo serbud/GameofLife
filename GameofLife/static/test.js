@@ -87,6 +87,10 @@ function sock(option){
                 rounds.value = data.round;
                 on_spinner = document.getElementById('spinner');
                 on_spinner.classList.remove("spinner-border");
+                if (data.winner == 1){alert("вы победили");
+                document.location.href = "http://127.0.0.1:5000/";}
+                 else if (data.winner == 2){alert("вы проиграли");
+                 document.location.href = "http://127.0.0.1:5000/";}
             }
 
         }
@@ -125,6 +129,10 @@ function get_ready(){
                  console.log("rounds.value: ", rounds.value);
                  on_spinner = document.getElementById('spinner');
                  on_spinner.classList.remove("spinner-border");
+                 if (data.winner == 2){alert("вы победили");
+                 document.location.href = "http://127.0.0.1:5000/";}
+                 else if (data.winner == 1){alert("вы проиграли");
+                 document.location.href = "http://127.0.0.1:5000/";}
             }
             else{
                 get_ready();
