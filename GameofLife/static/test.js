@@ -68,6 +68,9 @@ function sock(option){
       }
       else {
         var data = JSON.parse(xhr.responseText);
+        if (data.code == "1")
+        {document.location.href = "http://127.0.0.1:5000/sign_in";}
+
 
         if (data.code == 5)
         {

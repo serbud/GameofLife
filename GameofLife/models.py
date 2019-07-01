@@ -20,8 +20,8 @@ class User(BaseModel):
     email = CharField(max_length=100, null=True, default="")
     access_key = CharField(max_length=100, null=True, default="")
     count_win = IntegerField(default=0)
-    ready = BooleanField(default=True)
-    remain_cells = IntegerField(default=0)
+    ready = BooleanField(default=False)
+    remain_cells = IntegerField(default=100)
 
 class GameSession(BaseModel):
     id = AutoField()

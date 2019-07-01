@@ -261,13 +261,13 @@ def get_new_game_sessions():
 check_course = {}
 tmp = {}
 changes = {}
-
+tmp2 = {}
 
 @app.route('/course', methods=['POST'])
 def course():
     global check_course
     global tmp
-
+    global tmp2
     access_key = request.cookies.get("access_key")
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
@@ -305,7 +305,6 @@ def course():
                             world = [[0 for i1 in range(N+2)] for j1 in range(M+2)]
                         # check_course[gs.name] = True
 
-                        print("gs.count_cells",gs.count_cells)
 
                         us.remain_cells = gs.count_cells
                         us.save()
@@ -317,6 +316,15 @@ def course():
 
                         enemy_object.remain_cells = gs.count_cells
                         enemy_object.save()
+
+                        tmp2[gs.name] = True
+
+                        idddd = us.id
+                        print("idddd",idddd, us)
+                        userrrrrr = User.get_or_none(User.id == idddd)
+                        print("userrrrrr.remain_cells", userrrrrr.remain_cells, )
+
+
                         if check_course[gs.name] > 0:
                             code = True
                         else:
@@ -500,8 +508,9 @@ def course():
 @socketio.on('message')
 def handleMessage(id, j, i):
 
-
     print("ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!")
+
+
     global check_course
     id = str(id)
 
@@ -524,10 +533,21 @@ def handleMessage(id, j, i):
             j = int(j)
             color = -1
 
+            global tmp2
+
             us1 = gs.user1
             us2 = gs.user2
 
+            if tmp2[gs.name]:
+                tmp[gs.name] = False
+                us1.remain_cells = gs.count_cells
+                us2.remain_cells = gs.count_cells
+                us1.save()
+                us26649942.save()
 
+
+            print("us1.remain_cells", us1.remain_cells)
+            print("us2.remain_cells", us2.remain_cells)
 
             if id == str(gs.user1):
                 us = us1
@@ -550,6 +570,7 @@ def handleMessage(id, j, i):
                 if (world[i][j] == 0 and us.remain_cells > 0):
                     world[i][j] = 4
                     color = 2
+
                     us.remain_cells -= 1
 
                 elif world[i][j] == 4:
