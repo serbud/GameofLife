@@ -81,6 +81,27 @@ def POST_sign_in():
         return json.dumps({"code":"1"})
 
 
+@app.route('/sign_out',methods=['POST'])
+def POST_sign_out():
+    access_key = request.cookies.get("access_key")
+    if access_key != None:
+        us = User.get_or_none(access_key=access_key)
+        if us != None:
+            x = str(uuid.uuid1())
+            us.access_key = x
+            us.save()
+            res = make_response(json.dumps({"code": "0"}))
+            return res
+
+            return json.dumps({"code": "0"})
+        else:
+            return json.dumps({"code": "1"})
+    else:
+        return json.dumps({"code": "1"})
+
+
+
+
 @app.route('/add_game_session',methods=['POST'])
 def add_game_session():
     access_key = request.cookies.get("access_key")
@@ -459,6 +480,7 @@ def course():
                         resp = {"new_world": resp,
                                     "winner": winner,
                                            "round": round,
+                                            "code" : 0,
                                            "state_response": state_response}
                         changes[gs.name] = resp
 

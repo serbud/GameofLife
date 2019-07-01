@@ -79,7 +79,7 @@ function sock(option){
             get_ready();
         }
         else{
-        if(data.new_world != ""){
+        if(data.code == 0){
 
 
             for (var idx = 0; idx < data.new_world.length; idx++ ){

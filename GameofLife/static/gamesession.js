@@ -141,3 +141,21 @@ function addUserToSession(id) {
     xhr.send(data);
   }
 
+
+//Функция-запрос для добавления игровой сессии в базу данных
+function signOut() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/sign_out', true);
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    data = {"":""}
+    data = JSON.stringify(data);
+    xhr.onload = function(e){
+      if (xhr.status != 200) {
+        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+      } else {
+        document.location.href = "http://127.0.0.1:5000/sign_in";
+      }
+    }
+    xhr.send(data);
+  }
+
