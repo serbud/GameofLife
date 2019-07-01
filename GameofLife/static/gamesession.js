@@ -48,7 +48,7 @@ function addGameSession(nameGame, colRounds, colCells) {
       } else {
         var data = JSON.parse(xhr.responseText);
         if(data.code == '0'){
-            document.location.href = "http://127.0.0.1:5000/test_socket";
+            document.location.href = "http://127.0.0.1:5000/game";
         }
         else{
             alert("сессия не создалась!")
@@ -126,7 +126,7 @@ function addUserToSession(id) {
       } else {
         var data = JSON.parse(xhr.responseText);
         if(data.code == '0'){
-            document.location.href = "http://127.0.0.1:5000/test_socket";
+            document.location.href = "http://127.0.0.1:5000/game";
         }
         else{
             alert("невозможно подключиться к игре!")

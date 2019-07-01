@@ -602,7 +602,7 @@ def handleMessage(id, j, i):
                 send((us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells), broadcast=True)
 
 
-@app.route('/test_socket', methods=['GET'])
+@app.route('/game', methods=['GET'])
 def test_socket():
     access_key = request.cookies.get("access_key")
     if access_key != None:
@@ -610,7 +610,7 @@ def test_socket():
         if us != None:
 
 
-            return render_template('test.html', id = str(us.id))
+            return render_template('game.html', id = str(us.id))
 
 
         else:
