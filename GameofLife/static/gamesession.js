@@ -31,7 +31,7 @@ function insertListGameSessions(nameGame, nameUser, colRounds, colCells, id_sess
         });
 }
 
-//Функция-запрос для добавления игровой сессии в базу данных
+
 function addGameSession(nameGame, colRounds, colCells) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/add_game_session', true);
@@ -44,7 +44,7 @@ function addGameSession(nameGame, colRounds, colCells) {
     data = JSON.stringify(data);
     xhr.onload = function(e){
       if (xhr.status != 200) {
-        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+        console.log( xhr.status + ': ' + xhr.statusText );
       } else {
         var data = JSON.parse(xhr.responseText);
         if(data.code == '0'){
@@ -58,7 +58,6 @@ function addGameSession(nameGame, colRounds, colCells) {
     xhr.send(data);
 }
 
-//Функция для очищения чата
 function resetListOfSessions(){
     $(".listSessions").empty();
 }
@@ -74,14 +73,12 @@ function GetGameSession() {
     data = JSON.stringify(data);
     xhr.onload = function(e){
       if (xhr.status != 200) {
-        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+        console.log( xhr.status + ': ' + xhr.statusText );
       } else {
         var data = JSON.parse(xhr.responseText);
         if(data.code == '0'){
             resetListOfSessions();
-            console.log(data.game_sessions.length)
             for (var idx = 0; idx < data.game_sessions.length; idx++ ){
-                console.log(data.game_sessions[idx].name)
                 insertListGameSessions(data.game_sessions[idx].name,data.game_sessions[idx].creator,data.game_sessions[idx].count_rounds,data.game_sessions[idx].count_cells, data.game_sessions[idx].id)
             }
         }
@@ -95,7 +92,6 @@ function GetGameSession() {
 
 
 
-//Функция-запрос для добавления игровой сессии в базу данных
 function getNewGameSession() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/get_new_game_sessions', true);
@@ -104,7 +100,7 @@ function getNewGameSession() {
     data = JSON.stringify(data);
     xhr.onload = function(e){
       if (xhr.status != 200) {
-        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+        console.log( xhr.status + ': ' + xhr.statusText );
       } else {
         var data = JSON.parse(xhr.responseText);
         if(data.code == '0'){
@@ -118,7 +114,6 @@ function getNewGameSession() {
     xhr.send(data);
   }
 
-//Функция-запрос для добавления игровой сессии в базу данных
 function addUserToSession(id) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/add_user_to_game_session', true);
@@ -127,7 +122,7 @@ function addUserToSession(id) {
     data = JSON.stringify(data);
     xhr.onload = function(e){
       if (xhr.status != 200) {
-        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+        console.log( xhr.status + ': ' + xhr.statusText );
       } else {
         var data = JSON.parse(xhr.responseText);
         if(data.code == '0'){
@@ -142,7 +137,6 @@ function addUserToSession(id) {
   }
 
 
-//Функция-запрос для добавления игровой сессии в базу данных
 function signOut() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/sign_out', true);
@@ -151,7 +145,7 @@ function signOut() {
     data = JSON.stringify(data);
     xhr.onload = function(e){
       if (xhr.status != 200) {
-        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+        console.log( xhr.status + ': ' + xhr.statusText );
       } else {
         document.location.href = "http://127.0.0.1:5000/sign_in";
       }

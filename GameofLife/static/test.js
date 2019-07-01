@@ -1,4 +1,4 @@
-var canvas = document.getElementById('c1'); // получим canvas
+var canvas = document.getElementById('c1');
 var ctx = canvas.getContext('2d');
 
 var mas = [];
@@ -20,12 +20,11 @@ function createLine(){
     ctx.stroke();
 }
 
-// Создадим игровое поле.
 function goLife() {
     createLine();
-    var n = 50, m = 50; // Создадим массив, который имитирует игровое поле.
+    var n = 50, m = 50;
     for(var i = 0; i < m; i++) {
-        mas[i]=[]; // объявим пустой массив
+        mas[i]=[];
         for(var j = 0; j < n; j++) {
             mas[i][j] = 0;
         }
@@ -36,19 +35,15 @@ goLife();
 
 function drawField(color,x,y) {
     createLine();
-    console.log(color,x,y)
     if(color == 1) {
-        console.log("blue");
         ctx.fillStyle = "blue";
         ctx.fillRect(x*10+1, y*10+1, 9, 9);
     }
     else if(color == 2) {
-        console.log("red");
         ctx.fillStyle = "red";
         ctx.fillRect(x*10+1, y*10+1, 9, 9);
     }
     else if(color == 0){
-        console.log("white");
         ctx.fillStyle = "white";
         ctx.fillRect(x*10+1, y*10+1, 9, 9);
     }
@@ -64,7 +59,7 @@ function sock(option){
     data = JSON.stringify(data);
     xhr.onload = function(e){
       if (xhr.status != 200) {
-        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+        console.log( xhr.status + ': ' + xhr.statusText );
       }
       else {
         var data = JSON.parse(xhr.responseText);
@@ -75,7 +70,6 @@ function sock(option){
 
         if (data.code == 5)
         {
-            console.log("lp ready")
             get_ready();
         }
         else{
@@ -98,7 +92,7 @@ function sock(option){
 
         }
         else{
-        console.log("fff")
+        console.log("error")
         }
         }
     }}
@@ -118,7 +112,7 @@ function get_ready(){
 
     xhr.onload = function(e){
       if (xhr.status != 200) {
-        console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+        console.log( xhr.status + ': ' + xhr.statusText );
       } else {
              var data = JSON.parse(xhr.responseText);
             if(data.changed == "True"){
@@ -129,7 +123,6 @@ function get_ready(){
                  cells.value = data.state_response;
                  rounds = document.getElementById('round');
                  rounds.value = data.round;
-                 console.log("rounds.value: ", rounds.value);
                  on_spinner = document.getElementById('spinner');
                  on_spinner.classList.remove("spinner-border");
                  if (data.winner == 2){alert("вы победили");
@@ -146,27 +139,3 @@ function get_ready(){
 }
 
 
-//
-//function get_ready1(){
-//
-//    var xhr = new XMLHttpRequest();
-//    xhr.open('GET', '/lp_check_ready', true);
-//    xhr.setRequestHeader('Content-Type', 'application/json')
-//    data = {"":""}
-//    data = JSON.stringify(data);
-//
-//    xhr.onload = function(e){
-//        if (xhr.status != 200) {
-//            console.log( xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
-//        } else {
-//            var data = JSON.parse(xhr.responseText);
-//            if(data.changed == "True"){
-//                console.log('чат не выбран!')
-//            }
-//            else{
-//                get_ready();
-//            }
-//         }
-//    }
-//    xhr.send(data);
-//}
