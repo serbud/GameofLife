@@ -70,7 +70,8 @@ function sock(option){
         var data = JSON.parse(xhr.responseText);
         if (data.code == "1")
         {document.location.href = "http://127.0.0.1:5000/sign_in";}
-
+        if (data.code == "2")
+        {document.location.href = "http://127.0.0.1:5000/";}
 
         if (data.code == 5)
         {
@@ -82,8 +83,7 @@ function sock(option){
 
 
             for (var idx = 0; idx < data.new_world.length; idx++ ){
-
-              drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1);
+              drawField(data.new_world[idx].value, (data.new_world[idx].j) - 1 , data.new_world[idx].i - 1); }
                 cells = document.getElementById('state');
                 cells.value = data.state_response;
                 rounds = document.getElementById('round');
@@ -94,7 +94,7 @@ function sock(option){
                 document.location.href = "http://127.0.0.1:5000/";}
                  else if (data.winner == 2){alert("вы проиграли");
                  document.location.href = "http://127.0.0.1:5000/";}
-            }
+
 
         }
         else{

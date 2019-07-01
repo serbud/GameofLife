@@ -23,7 +23,6 @@ def sign_up():
 @app.route('/sign_up', methods=['POST'])
 def POST_sign_up():
     data = request.get_json()
-    print(data)
     us = User.get_or_none(login=data["login"])
     if us != None:
         return json.dumps({"code": "1"})
@@ -96,7 +95,6 @@ def add_game_session():
                 user1=us
             )
             gs.save()
-            print("ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!")
             if 'password' in data:
                 gs.password = data["password"]
                 gs.save()
@@ -230,7 +228,6 @@ def get_new_game_sessions():
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
-            print("us")
             start = time.monotonic()
             now = time.monotonic()
             passtime = 0
@@ -312,7 +309,6 @@ def course():
 
                         # for i1 in world:
                         #     print(i1)
-                        print("gs.count_cells",gs.count_cells, enemy_object.remain_cells, us.remain_cells)
 
                         enemy_object.remain_cells = gs.count_cells
                         enemy_object.save()
@@ -320,9 +316,7 @@ def course():
                         tmp2[gs.name] = True
 
                         idddd = us.id
-                        print("idddd",idddd, us)
                         userrrrrr = User.get_or_none(User.id == idddd)
-                        print("userrrrrr.remain_cells", userrrrrr.remain_cells, )
 
 
                         if check_course[gs.name] > 0:
@@ -331,7 +325,6 @@ def course():
                             code = False
                         check_course[gs.name] = 0
 
-                        print("code", code)
                         for i in range(1,N+1,1):
                             for j in range(1,M+1,1):
 
@@ -423,25 +416,20 @@ def course():
                         us.ready = True
                         us.save()
 
-                        print("")
-                        print("")
-                        print("")
-                        print("")
+                      # )
 
-                        # for i in world2:
-                        #     print(i)
+
 
                         gs.round += 1
                         gs.save()
 
 
-
                         # f2 = open('worlds/' + gs.name + "changes.pickle", 'wb')
                         # pickle.dump(resp, f2)
                         # f2.close()
-                        round = gs.round
+                        round = gs.round - 1
                         state_response = gs.count_cells
-                        if not (gs.round > gs.count_rounds):
+                        if not (gs.round - 1 > gs.count_rounds):
                             winner = 0
                         else:
                             g1 = 0
@@ -500,15 +488,11 @@ def course():
         return json.dumps({"code": "1"})
 
 
-# @socketio.on('my event')
-# def handle_my_custom_event(json):
-#     print('received json: ' + str(json))
-#     send(json, json=True)
+
 
 @socketio.on('message')
 def handleMessage(id, j, i):
 
-    print("ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!ALARM!!!")
 
 
     global check_course
@@ -523,7 +507,6 @@ def handleMessage(id, j, i):
     if gs == None:
         gs = GameSession.get_or_none(GameSession.user2 == id)
     if gs.name in check_course:
-        # print("check_course[gs.name]",check_course[gs.name])
         if not check_course[gs.name]:
             f = open('worlds/' + gs.name + ".pickle", 'rb')
             world = pickle.load(f)
@@ -539,20 +522,18 @@ def handleMessage(id, j, i):
             us2 = gs.user2
 
             if tmp2[gs.name]:
-                tmp[gs.name] = False
+                tmp2[gs.name] = False
                 us1.remain_cells = gs.count_cells
                 us2.remain_cells = gs.count_cells
                 us1.save()
-                us26649942.save()
+                us2.save()
 
 
-            print("us1.remain_cells", us1.remain_cells)
-            print("us2.remain_cells", us2.remain_cells)
+
 
             if id == str(gs.user1):
                 us = us1
                 enemy = us2
-                # print("us.remain_cells < gs.count_cells + 1",us.remain_cells, gs.count_cells + 1)
                 if (world[i][j] == 0 and us.remain_cells > 0):
                     world[i][j] = 3
                     color = 1
@@ -566,7 +547,6 @@ def handleMessage(id, j, i):
 
                 us = us2
                 enemy = us1
-                # print("us.remain_cells", us.remain_cells)
                 if (world[i][j] == 0 and us.remain_cells > 0):
                     world[i][j] = 4
                     color = 2
@@ -595,9 +575,7 @@ def handleMessage(id, j, i):
 
 
 
-            # for i1 in world:
-            #     print(i1)
-            print(us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells)
+
             if color != -1:
                 send((us.id, enemy.id, j-1 , i-1 ,color, us.remain_cells), broadcast=True)
 
@@ -608,6 +586,8 @@ def test_socket():
     if access_key != None:
         us = User.get_or_none(User.access_key == access_key)
         if us != None:
+
+
             return render_template('test.html', id = str(us.id))
 
 
@@ -646,7 +626,6 @@ def lp_check_ready():
                     enemy = gs.user2
                 enemy = enemy.id
 
-            print("enemy",enemy)
             start = time.monotonic()
             now = time.monotonic()
             passtime = 0
@@ -664,7 +643,6 @@ def lp_check_ready():
                         # f2 = open('worlds/' + gs.name + "changes.pickle", 'rb')
                         new_world = changes[gs.name]#pickle.load(f2)
                         new_world["changed"] = "True"
-                        print("new_world",new_world)
                         tmp[gs.name] = False
                         # f2.close()
                         u1 = gs.user1
