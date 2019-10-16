@@ -17,6 +17,7 @@
 # Установка
 1. Python 3.6
 2. pip install -r requirements.txt
+# Скриншоты
 !["регистрация пользователей"](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-07.png?raw=true)
 ![авторизация пользователей](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-16.png?raw=true)
 ![меню выбора сессии](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-22.png?raw=true)
