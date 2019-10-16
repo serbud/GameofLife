@@ -18,3 +18,4 @@
 1. Python 3.6
 2. pip install -r requirements.txt
 
+![](C:/home/serbud/GameofLife/GameofLife/Screenshots)
