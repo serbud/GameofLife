@@ -17,4 +17,12 @@
 # Установка
 1. Python 3.6
 2. pip install -r requirements.txt
-![](https://sun9-40.userapi.com/c857532/v857532105/a6684/tAtLcsHRh6s.jpg)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-07.png?raw=true)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-16.png?raw=true)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-22.png?raw=true)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-31.png?raw=true)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-35.png?raw=true)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-03-57.png?raw=true)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-04-03.png?raw=true)
+![](https://github.com/serbud/GameofLife/blob/master/GameofLife/Screenshots/Снимок%20экрана%20от%202019-07-01%2010-04-58.png?raw=true)
+
