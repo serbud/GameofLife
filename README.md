@@ -17,4 +17,4 @@
 # Установка
 1. Python 3.6
 2. pip install -r requirements.txt
-![](https://sun1-86.userapi.com/c851228/v851228417/1eb500/QxAo6L9cnJE.jpg)
+![](https://sun9-40.userapi.com/c857532/v857532105/a6684/tAtLcsHRh6s.jpg)
