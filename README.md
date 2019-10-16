@@ -17,6 +17,4 @@
 # Установка
 1. Python 3.6
 2. pip install -r requirements.txt
-/home/serbud/GameofLife/GameofLife/Screenshots
-![](/home/serbud/GameofLife/GameofLife/Screenshots/Снимок экрана от 2019-07-01 10-03-07.png)
-<img src="file:///C:/Users/username/Pictures/MLO/mlo_logo.jpg" />
+![](https://sun1-86.userapi.com/c851228/v851228417/1eb500/QxAo6L9cnJE.jpg)
